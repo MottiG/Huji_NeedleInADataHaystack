@@ -10,25 +10,6 @@ IDX_OF_CATEGORY = 0
 STORE_URL = "http://www.divers-supply.com"
 PRODUCTS_PAGE_LIMIT = {'limit': '48'} # number of products per page
 
-headers = {"X-Requested-With": "XMLHttpRequest",
-         'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
-
-
-# TODO work on reviews:
-raw_page2 = rq.get("http://www.divers-supply.com/scuba-gear/bcd/cressi-ultralight-lady-bcd.html", headers=headers)
-page2 = Bs(raw_page2.content)
-scripts = page2.find_all('script', {'type': 'text/javascript'})
-script = None
-for s in scripts:
-    if len(s.contents) > 0 and str(s.contents[0]).find('tbConfig'):
-        script = s
-
-print(page2.prettify())
-prod = {}
-rev_div = page2.find_all('div', {'class': 'targetbay-review-lists'})
-gd = None
-# end of work
-
 
 def retrieve_categories_links(url: str) -> list:
     print("GETS CATEGORIES")  # TODO dell
@@ -60,30 +41,28 @@ def retrieve_product_json(prod_link: str) -> json:
     print("GETS JSONS")  # TODO dell
     time.sleep(SEC_TO_WAIT)
     prod_dict = dict()
-    prod_dict['Url'] = prod_link
     raw_page = rq.get(prod_link).content
     page = Bs(raw_page, 'lxml')
     title = page.title.string.split(" - ")
-    name = title[0].strip()
-    sub_category = title[1].strip()
-    category = title[2].strip()
     price = page.find('div', {'class': 'price-box'}).find_all('span', {'class': 'price'})
-    im = page.find('div', {'class': 'product-img-box'}).find('a').get('href')
-    name = page.find('div', {'class': 'product-name'}).find('h1').contents
-    desc_lines = page2.find('div', {'class': 'product-collateral'}).find('div', {'class': 'std'}).find_all('p')
+    desc_lines = page.find('div', {'class': 'product-collateral'}).find('div', {'class': 'std'}).find_all('p')
     desc = ""
     for p in desc_lines:
         for line in p.strings:
             desc += line
+    prod_dict['URL'] = prod_link
+    prod_dict['Title'] = title[0].strip()
+    prod_dict['Sub-Category'] = title[1].strip()
+    prod_dict['Category'] = title[2].strip()
     if len(price) > 1:
         prod_dict['Price'] = {'Old Price': price[0].contents[0].strip(), 'Sale Price': price[1].contents[0].strip()}
     else:
         prod_dict['Price'] = price[0].contents[0].strip()
+    prod_dict['Image URL'] = page.find('div', {'class': 'product-img-box'}).find('a').get('href')
+    prod_dict['Description'] = desc
+    return json.dump(prod_dict)
 
 
-#
-#
-#
 # list_of_categories_links = retrieve_categories_links(STORE_URL)
 # products_links = []
 # products_jsons = []
