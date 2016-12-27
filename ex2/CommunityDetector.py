@@ -48,17 +48,24 @@ def clique_percolation(k: int, g: nx.Graph):
 if __name__ == '__main__':
 
     graph = get_graph(EGO_NET_PATH)
+    graph.remove_edges_from(graph.selfloop_edges())
+
     a_ans = '# of nodes: ' + str(graph.number_of_nodes()) + '\n'
     a_ans += '# of edges: ' + str(graph.number_of_edges())
+    # 61 nodes and 270 edges
     print('(a)\n' + a_ans)
+
     connected_components = sorted(nx.connected_components(graph), key=len, reverse=True)  # list of lists of connected nodes
     b_ans = '# of connected components: ' + str(len(connected_components)) + '\n'
     b_ans += '# of nodes in biggest component: ' + str(len(connected_components[0]))
+    # 3 connected components, the biggest has 40 nodes
     print('\n(b)\n' + b_ans)
+
     communities = clique_percolation(K, graph)
-    c_ans = '# of communities: ' + str(len(communities)) + '\n'
+    c_ans = '# of communities: ' + str(len(communities)) + '\n'  # 5 communities
     print('\n(c)\n' + c_ans + 'nodes of communities:')
     for community in communities:
-        print(community)
+
+        print(*community, sep=',')
 
 
