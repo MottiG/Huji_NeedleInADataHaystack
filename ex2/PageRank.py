@@ -2,7 +2,7 @@ import numpy as np
 np.set_printoptions(precision=5)
 
 
-def rank(mat, beta, S):
+def rank(mat, beta, S, e):
 
     print('Initial M:\n', mat)
 
@@ -27,7 +27,7 @@ def rank(mat, beta, S):
 
 if __name__ == '__main__':
 
-    e = 0.01  # epsilon
+    epsilon = 0.01
     b = 0.85  # beta
     s = np.array([2])  # set of pages to teleport, where pages start from 0
     M = np.array([[1, 1, 0],
@@ -35,4 +35,4 @@ if __name__ == '__main__':
                   [1, 1, 1]])
     M = M / M.sum(axis=0)
 
-    rank(M, b, s)
+    rank(M, b, s, epsilon)
